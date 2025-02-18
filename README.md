@@ -2,6 +2,10 @@
 
 This project demonstrates how to configure and run the OpenTelemetry Collector to export telemetry data from a Python App to Elastic APM using the OTLP protocol. 📡🔍
 
+# 👷‍♂️ OpenTelemetry Architecture
+
+![alt text](image-1.png)
+
 ## 📌 Requirements
 
 Before you begin, make sure you have the following dependencies installed:
