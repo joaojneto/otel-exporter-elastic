@@ -87,6 +87,7 @@ Once the setup is complete, you can view the APM metrics using Kibana. 📈✨
 * 📖 OpenTelemetry Exporter Documentation: [OpenTelemetry Exporters](https://opentelemetry.io/docs/languages/python/exporters/#usage)
 * 📖 OpenTelemetry Instrumentation Documentation: [OpenTelemetry Instrumentation](https://opentelemetry.io/docs/languages/python/instrumentation/)
 * 📖 OpenTelemetry Flask Instrumentation Documentation: [OpenTelemetry Flask Instrumentation](https://pypi.org/project/opentelemetry-instrumentation-flask/)
+* 📖 OpenTelemetry how to send logs: [OpenTelemetry Logging](https://docs.honeycomb.io/send-data/logs/opentelemetry/sdk/python/)
 
 ### 🎯 Now you're all set to monitor your applications with OpenTelemetry! 🚀🐍
 ### Happy Observing! 👀🔍
