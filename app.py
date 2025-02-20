@@ -22,12 +22,15 @@ from opentelemetry.sdk.resources import Resource
 
 #### Flask import
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from flask import Flask, render_template
+from flask import Flask, request, render_template, jsonify
 
 # Load Env File
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
+# Load Sqlite3 connection
+import db_sqlite
 
 # Load envs
 OTEL_ENDPOINT = os.getenv("OTEL_ENDPOINT")
@@ -87,6 +90,17 @@ def index():
 def error():
     raise Exception("Unexpected error")
 
+@app.route("/signup", methods=["POST"])
+def signup():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    
+    conn = db_sqlite.connectDB()
+    message = db_sqlite.createUser(conn,username,password)
+    print(message)
+    
+    return jsonify({"message": message})
+
 # Custom 500 handler
 @app.errorhandler(500)
 def internal_error(error):
@@ -100,4 +114,4 @@ def page_not_found(error):
 
 # Main application
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
