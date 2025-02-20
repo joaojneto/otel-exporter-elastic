@@ -1,7 +1,8 @@
-from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
+from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, DEPLOYMENT_ENVIRONMENT, Resource
 
 ######## Tracer import
 from opentelemetry import trace
+from opentelemetry.trace import SpanKind
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -18,7 +19,6 @@ from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-from opentelemetry.sdk.resources import Resource
 
 #### Flask import
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -36,11 +36,13 @@ import db_sqlite
 OTEL_ENDPOINT = os.getenv("OTEL_ENDPOINT")
 APP_NAME = os.getenv("APP_NAME") 
 APP_VERSION = os.getenv("APP_VERSION")
+DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV")
 
 # Set service name and version
 resource = Resource(attributes={
     SERVICE_NAME: APP_NAME,
-    SERVICE_VERSION: APP_VERSION
+    SERVICE_VERSION: APP_VERSION,
+    DEPLOYMENT_ENVIRONMENT: DEPLOYMENT_ENV,
 })
 
 ######## Traces
@@ -95,9 +97,14 @@ def signup():
     username = request.form.get("username")
     password = request.form.get("password")
     
-    conn = db_sqlite.connectDB()
-    message = db_sqlite.createUser(conn,username,password)
-    print(message)
+    tracer = trace.get_tracer(__name__)
+    with tracer.start_as_current_span("Sqlite DB Connect", kind=SpanKind.CLIENT) as span:
+        span.set_attribute("db.system", "sqlite")
+        conn = db_sqlite.connectDB()
+    with tracer.start_as_current_span("Sqlite Create User", kind=SpanKind.CLIENT) as span:
+        span.set_attribute("db.system", "sqlite")
+        conn = db_sqlite.connectDB()
+        message = db_sqlite.createUser(conn,username,password)
     
     return jsonify({"message": message})
 
